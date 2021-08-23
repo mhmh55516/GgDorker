@@ -36,6 +36,7 @@ parser.add_argument("-s", "--silent", help="Silent Mode only Show The Results",a
 parser.add_argument("-n", "--threads", help="Maximum n threads, default=5",default=5,type=int)
 parser.add_argument("-p", "--page", help="Number of pages, default=1",default=1,type=int)
 parser.add_argument("-o", "--output", help="output to file name")
+parser.add_argument("--proxy", help="use proxy socks5://user:pass@host:port", action="store_true", default=None)
 args = parser.parse_args()
 
 dorks_file = args.dorks
@@ -45,7 +46,7 @@ threads = args.threads
 query = args.query
 output = args.output
 subs = args.subs 
-
+proxy_server = args.proxy
 
 dorks_list = []
 
@@ -85,9 +86,13 @@ def filter_subs(links):
 def startpage(word,page):
     links = []
     headers={"User-agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:88.0) Gecko/20100101 Firefox/88.0"}
+    
+    if proxy_server:
+        proxy = {'https': proxy_server}
+        
     for page_number in range(1,page+1):
         try:
-            req = requests.get(f'https://www.startpage.com/do/search?q={word}&segment=startpage.brave&page={page_number}',headers=headers).text
+            req = requests.get(f'https://www.startpage.com/do/search?q={word}&segment=startpage.brave&page={page_number}',headers=headers, proxies=proxy).text
             if "<title></title>" in req:
                 break
             else :   
